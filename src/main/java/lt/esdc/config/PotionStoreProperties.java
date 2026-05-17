@@ -1,0 +1,16 @@
+package lt.esdc.config;
+
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Data
+@Component
+@ConfigurationProperties(prefix = "potion.store")
+public class PotionStoreProperties {
+    private String name;
+    private int maxPotions;
+    private List<String> openDays;
+}
