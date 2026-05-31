@@ -32,44 +32,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        
-        // 1. Ищем заголовок Authorization
+
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String username;
 
-        // Если заголовка нет или он не начинается с "Bearer ", идем дальше (возможно это публичный эндпоинт)
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 2. Достаем токен (отрезаем первые 7 символов: "Bearer ")
         jwt = authHeader.substring(7);
-        
-        // 3. Извлекаем имя пользователя из токена
-        username = jwtService.extractUsername(jwt);
 
-        // 4. Если имя есть, а пользователь еще не аутентифицирован в текущем контексте Spring Security
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            
-            // Ищем пользователя в базе (в нашем случае - в памяти)
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+        try {
+            username = jwtService.extractUsername(jwt);
 
-            // Если токен валиден (не истек и подпись совпадает)
-            if (jwtService.isTokenValid(jwt, userDetails)) {
-                
-                // Создаем объект аутентификации
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities()
-                );
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                
-                // Сохраняем аутентификацию в контекст Spring Security
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+
+                if (jwtService.isTokenValid(jwt, userDetails)) {
+
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Unauthorized: Token in invalid or expired");
         }
-        // Передаем запрос дальше по цепочке фильтров
         filterChain.doFilter(request, response);
     }
 }
