@@ -4,7 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
+import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
+import org.springframework.stereotype.Component;
 
+@Component
 public class AuthenticationEventListener {
 
     private static final Logger log = LoggerFactory.getLogger(AuthenticationEventListener.class);
@@ -16,8 +19,8 @@ public class AuthenticationEventListener {
     }
 
     @EventListener
-    public void onFailure(AuthenticationSuccessEvent event) {
+    public void onFailure(AbstractAuthenticationFailureEvent event) {
         String username = event.getAuthentication().getName();
-        log.info("Неудачная попытка входа! Алхимик: {}", username);
+        log.warn("Неудачная попытка входа! Алхимик: {}. Причина: {}", username, event.getException().getMessage());
     }
 }

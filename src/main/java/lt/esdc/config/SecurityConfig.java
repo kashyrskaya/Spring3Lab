@@ -1,8 +1,6 @@
 package lt.esdc.config;
 
-import lt.esdc.security.AuthenticationEventListener;
 import lt.esdc.security.JwtAuthenticationFilter;
-import org.springframework.boot.actuate.autoconfigure.wavefront.WavefrontProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
