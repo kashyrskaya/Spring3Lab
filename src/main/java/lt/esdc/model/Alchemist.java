@@ -27,7 +27,7 @@ public class Alchemist {
 
     @Id
     @NotBlank(message = "Alchemist ID is required")
-    private String id; // This will match the X-Alchemist-ID header
+    private String id;
 
     @NotBlank(message = "Alchemist name is required")
     private String name;
@@ -36,7 +36,7 @@ public class Alchemist {
     @Column(name = "experience_level")
     private int experienceLevel;
 
-    private String specialty; // e.g., "Healing", "Poisons", "Transmutation"
+    private String specialty;
 
     @OneToMany(mappedBy = "alchemist", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
