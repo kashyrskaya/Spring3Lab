@@ -10,6 +10,9 @@ RUN mvn clean package
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
+# Install ca-certificates to trust public SSL certificates
+RUN apk add --no-cache ca-certificates
+
 COPY --from=builder /app/target/*.jar app.jar
 
 EXPOSE 8080
